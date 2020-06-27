@@ -103,7 +103,6 @@ public final class Checker implements Visitor {
 
   public Object visitAssignCommand(AssignCommand ast, Object o) {
       
-    System.out.println("hola3");
     TypeDenoter vType = (TypeDenoter) ast.V.visit(this, null);
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     
@@ -143,17 +142,18 @@ public final class Checker implements Visitor {
     return null;
   }
 
+  //NUEVO
   public Object visitForCommand(ForCommand ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
-    if (! eType.equals(StdEnvironment.booleanType))
-      reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    if (! eType.equals(StdEnvironment.integerType))
+      reporter.reportError("Integer expression expected here", "", ast.E.position);
     ast.D.visit(this, null);
     ast.C.visit(this, null);
+    idTable.closeScope();
     return null;
   }
   
   public Object visitLetCommand(LetCommand ast, Object o) {
-      System.out.println("hola");
     idTable.openScope();
     ast.D.visit(this, null);
     ast.C.visit(this, null);
@@ -177,23 +177,26 @@ public final class Checker implements Visitor {
     return null;
   }
   
+  //NUEVO
   public Object visitdoWhileCommand(doWhileCommand ast, Object o) {
+    ast.C.visit(this, null);
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     if (! eType.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E.position);
-    ast.C.visit(this, null);
     return null;
   }
 
+  //NUEVO
   public Object visitdoUntilCommand(doUntilCommand ast, Object o) {
+    ast.C.visit(this, null);
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     if (! eType.equals(StdEnvironment.booleanType))
       reporter.reportError("Boolean expression expected here", "", ast.E.position);
-    ast.C.visit(this, null);
     return null;
   }
 
 
+  //NUEVO
   public Object visitUntilCommand(UntilCommand ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     if (! eType.equals(StdEnvironment.booleanType))
@@ -337,20 +340,27 @@ public final class Checker implements Visitor {
     return null;
   }
 
+  //NUEVO
   public Object visitRepVarDeclaration(RepVarDeclaration ast, Object o) {
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
-    if (! eType.equals(StdEnvironment.booleanType))
-        reporter.reportError("Boolean expression expected here", "", ast.E.position);
+    if (! eType.equals(StdEnvironment.integerType))
+        reporter.reportError("Integer expression expected here", "", ast.E.position);
+    idTable.openScope();
     ast.I.visit(this, null);
+    idTable.enter(ast.I.spelling, ast);
     return null;
   }
   
-  public Object visitPriDeclaration(PriDeclaration ast, Object o) {  
+  //NUEVO
+  public Object visitPriDeclaration(PriDeclaration ast, Object o) {
+    idTable.latest0 = idTable.latest;
+    ast.D1.visit(this, null);
+    ast.D2.visit(this, null);
+    idTable.first2latest();
     return null;
   }
   
   public Object visitConstDeclaration(ConstDeclaration ast, Object o) {
-      
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
     idTable.enter(ast.I.spelling, ast);
     if (ast.duplicated)
@@ -358,6 +368,7 @@ public final class Checker implements Visitor {
                             ast.I.spelling, ast.position);
     return null;
   }
+  
 
   public Object visitFuncDeclaration(FuncDeclaration ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
@@ -394,6 +405,7 @@ public final class Checker implements Visitor {
     return null;
   }
 
+  //NUEVO
   public Object visitProcsDeclaration(ProcsDeclaration ast, Object o) {
     ast.D1.visit(this, null);
     ast.D2.visit(this, null);
@@ -414,7 +426,6 @@ public final class Checker implements Visitor {
   }
 
   public Object visitVarDeclaration(VarDeclaration ast, Object o) {
-      System.out.println("hola2");
     ast.T = (TypeDenoter) ast.T.visit(this, null);
     idTable.enter (ast.I.spelling, ast);
     if (ast.duplicated)
@@ -424,13 +435,17 @@ public final class Checker implements Visitor {
   }
 
   public Object visitVarExpDeclaration(VarExpDeclaration ast, Object o) {
-    TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
-    if (! eType.equals(StdEnvironment.booleanType))
-        reporter.reportError("Boolean expression expected here", "", ast.E.position);
-    ast.I.visit(this, null);
+    idTable.enter (ast.I.spelling, ast);
+    if (ast.duplicated)
+      reporter.reportError ("identifier \"%\" already declared",
+                            ast.I.spelling, ast.position);
+    ast.T = (TypeDenoter) ast.E.visit(this, null);
     return null;
   }
 
+ 
+
+  
   
   // Array Aggregates
 
@@ -794,12 +809,18 @@ public final class Checker implements Visitor {
       } else if (binding instanceof VarDeclaration) {
         ast.type = ((VarDeclaration) binding).T;
         ast.variable = true;
+      }else if (binding instanceof VarExpDeclaration) {            //Nuevo
+        ast.type = ((VarExpDeclaration) binding).T;
+        ast.variable = true;
       } else if (binding instanceof ConstFormalParameter) {
         ast.type = ((ConstFormalParameter) binding).T;
         ast.variable = false;
       } else if (binding instanceof VarFormalParameter) {
         ast.type = ((VarFormalParameter) binding).T;
         ast.variable = true;
+      } else if (binding instanceof RepVarDeclaration) {            //Nuevo
+        ast.type = ((RepVarDeclaration) binding).E.type;
+        ast.variable = false;
       } else
         reporter.reportError ("\"%\" is not a const or var identifier",
                               ast.I.spelling, ast.I.position);

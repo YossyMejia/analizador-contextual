@@ -19,13 +19,19 @@ import Triangle.AbstractSyntaxTrees.Declaration;
 public final class IdentificationTable {
 
   private int level;
-  private IdEntry latest;
+  public IdEntry latest;
+  public IdEntry latest0;
 
   public IdentificationTable () {
     level = 0;
     latest = null;
   }
 
+  public void first2latest(){
+      //IdEntry entry = this.latest;
+      this.latest.previous = this.latest0;
+  }
+  
   // Opens a new level in the identification table, 1 higher than the
   // current topmost level.
 
@@ -51,6 +57,7 @@ public final class IdentificationTable {
     this.latest = entry;
   }
 
+  
   // Makes a new entry in the identification table for the given identifier
   // and attribute. The new entry belongs to the current level.
   // duplicated is set to to true iff there is already an entry for the
