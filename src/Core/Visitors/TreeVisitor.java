@@ -52,6 +52,7 @@ import Triangle.AbstractSyntaxTrees.ProcsDeclaration;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecsDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -211,6 +212,12 @@ public class TreeVisitor implements Visitor {
     
     public Object visitPriDeclaration(PriDeclaration ast, Object o) {  
         return(createBinary("Private Declaration", ast.D1, ast.D2));
+    }
+
+    
+    //Nuevo
+    public Object visitRecsDeclaration(RecsDeclaration ast, Object o) {
+        return(createUnary("Recs Declaration", ast.D)); 
     }
     
     public Object visitProcDeclaration(ProcDeclaration ast, Object obj) {
@@ -482,6 +489,7 @@ public class TreeVisitor implements Visitor {
     }
     // </editor-fold>
 
+ 
     
     
 

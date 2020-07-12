@@ -67,6 +67,7 @@ import Triangle.AbstractSyntaxTrees.ProcsDeclaration;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecsDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -97,6 +98,8 @@ import Triangle.SyntacticAnalyzer.SourcePosition;
 
 public final class Checker implements Visitor {
 
+    public boolean saveId = false;
+    public boolean recOn = false;
   // Commands
 
   // Always returns null. Does not use the given object.
@@ -156,6 +159,7 @@ public final class Checker implements Visitor {
   public Object visitLetCommand(LetCommand ast, Object o) {
     idTable.openScope();
     ast.D.visit(this, null);
+    idTable.asign();
     ast.C.visit(this, null);
     idTable.closeScope();
     return null;
@@ -353,10 +357,10 @@ public final class Checker implements Visitor {
   
   //NUEVO
   public Object visitPriDeclaration(PriDeclaration ast, Object o) {
-    idTable.latest0 = idTable.latest;
+    idTable.latests.add(idTable.latest);
     ast.D1.visit(this, null);
+    idTable.privDecl2 = true;
     ast.D2.visit(this, null);
-    idTable.first2latest();
     return null;
   }
   
@@ -371,11 +375,30 @@ public final class Checker implements Visitor {
   
 
   public Object visitFuncDeclaration(FuncDeclaration ast, Object o) {
+    if(this.saveId){
+       this.visitFuncDeclarationID(ast, o);
+    }
+    else if(this.saveId==false){
+        this.visitFuncDeclarationBody(ast, o);
+    }
+    else if(this.recOn==false){
+        this.visitFuncDeclarationID(ast, o);
+        this.visitFuncDeclarationBody(ast, o);
+    }
+    return null;
+  }
+    
+    
+  public Object visitFuncDeclarationID(FuncDeclaration ast, Object o) {
     ast.T = (TypeDenoter) ast.T.visit(this, null);
-    idTable.enter (ast.I.spelling, ast); // permits recursion
+       idTable.enter (ast.I.spelling, ast); // permits recursion
     if (ast.duplicated)
       reporter.reportError ("identifier \"%\" already declared",
                             ast.I.spelling, ast.position);
+    return null;
+  }
+  
+  public Object visitFuncDeclarationBody(FuncDeclaration ast, Object o) {
     idTable.openScope();
     ast.FPS.visit(this, null);
     TypeDenoter eType = (TypeDenoter) ast.E.visit(this, null);
@@ -385,26 +408,52 @@ public final class Checker implements Visitor {
                             ast.I.spelling, ast.E.position);
     return null;
   }
-
+  
   public Object visitProcDeclaration(ProcDeclaration ast, Object o) {
-      
-    idTable.enter (ast.I.spelling, ast); // permits recursion
-    if (ast.duplicated)
-      reporter.reportError ("identifier \"%\" already declared",
-                            ast.I.spelling, ast.position);
+    if(this.saveId==true & this.recOn==true){
+       this.visitProcDeclarationID(ast, o);
+    }
+    else if(this.saveId==false & this.recOn==true){
+        this.visitProcDeclarationBody(ast, o);
+    }
+    else if(this.recOn==false){
+        this.visitProcDeclarationID(ast, o);
+        this.visitProcDeclarationBody(ast, o);
+    }
+    return null;
+  }
+
+  public Object visitProcDeclarationBody(ProcDeclaration ast, Object o) {
     idTable.openScope();
     ast.FPS.visit(this, null);
     ast.C.visit(this, null);
     idTable.closeScope();
     return null;
   }
-
+  
+  public Object visitProcDeclarationID(ProcDeclaration ast, Object o) {
+    idTable.enter (ast.I.spelling, ast); // permits recursion
+    if (ast.duplicated)
+      reporter.reportError ("identifier \"%\" already declared",
+                            ast.I.spelling, ast.position);
+    return null;
+  }
+  
   public Object visitSequentialDeclaration(SequentialDeclaration ast, Object o) {
     ast.D1.visit(this, null);
     ast.D2.visit(this, null);
     return null;
   }
 
+  public Object visitRecsDeclaration(RecsDeclaration ast, Object o) {
+    this.saveId= true; this.recOn = true;
+    ast.D.visit(this, null);
+    this.saveId= false;
+    ast.D.visit(this, null);
+    this.recOn = false;
+    return null;
+  }
+  
   //NUEVO
   public Object visitProcsDeclaration(ProcsDeclaration ast, Object o) {
     ast.D1.visit(this, null);
@@ -494,8 +543,7 @@ public final class Checker implements Visitor {
   // Always returns null. Does not use the given object.
 
   public Object visitConstFormalParameter(ConstFormalParameter ast, Object o) {
-      
-  
+     
     ast.T = (TypeDenoter) ast.T.visit(this, null);
     idTable.enter(ast.I.spelling, ast);
     if (ast.duplicated)
@@ -743,6 +791,7 @@ public final class Checker implements Visitor {
   }
 
   public Object visitIdentifier(Identifier I, Object o) {
+     // System.out.println(I.spelling);
     Declaration binding = idTable.retrieve(I.spelling);
     if (binding != null)
       I.decl = binding;
@@ -943,6 +992,7 @@ public final class Checker implements Visitor {
     idTable.enter(id, binding);
     return binding;
   }
+  
 
   // Creates a small AST to represent the "declaration" of a standard
   // type, and enters it in the identification table.
@@ -1044,6 +1094,10 @@ public final class Checker implements Visitor {
     StdEnvironment.unequalDecl = declareStdBinaryOp("\\=", StdEnvironment.anyType, StdEnvironment.anyType, StdEnvironment.booleanType);
 
   }
+
+    
+
+    
 
    
     

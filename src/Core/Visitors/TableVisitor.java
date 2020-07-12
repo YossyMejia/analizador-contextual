@@ -52,6 +52,7 @@ import Triangle.AbstractSyntaxTrees.ProcsDeclaration;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecsDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -362,6 +363,11 @@ public class TableVisitor implements Visitor {
       return(null);
   }
   
+   //Nuevo
+    public Object visitRecsDeclaration(RecsDeclaration ast, Object o) {
+        return null;
+    }
+  
   public Object visitVarExpDeclaration(VarExpDeclaration ast, Object o) {
       //try {
       //addIdentifier(ast.I.spelling, 
@@ -375,6 +381,9 @@ public class TableVisitor implements Visitor {
       //ast.E.visit(this, null);
       return(null);
   }
+  
+ 
+
   
   public Object visitRepVarDeclaration(RepVarDeclaration ast, Object o) {
       ast.I.visit(this, null);
@@ -697,6 +706,8 @@ public class TableVisitor implements Visitor {
     private DefaultTableModel model;
     // </editor-fold>
 
+   
+   
     
 
     

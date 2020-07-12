@@ -64,6 +64,7 @@ import Triangle.AbstractSyntaxTrees.ProcsDeclaration;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecsDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -216,11 +217,16 @@ public class LayoutVisitor implements Visitor {
   public Object visitProcDeclaration(ProcDeclaration ast, Object obj) {
     return layoutTernary("ProcDecl.", ast.I, ast.FPS, ast.C);
   }
-
+  
   public Object visitSequentialDeclaration(SequentialDeclaration ast, Object obj) {
     return layoutBinary("Seq.Decl.", ast.D1, ast.D2);
   }
 
+  //Nuevo
+  public Object visitRecsDeclaration(RecsDeclaration ast, Object o) {
+    return layoutUnary("Recs-Decl", ast.D);
+  }
+    
   public Object visitProcsDeclaration(ProcsDeclaration ast, Object obj) {
     return layoutBinary("Procs-func", ast.D1, ast.D2);
   }
@@ -586,6 +592,10 @@ public class LayoutVisitor implements Visitor {
 
     return r;
   }
+
+ 
+
+   
 
     
     

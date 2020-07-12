@@ -15,22 +15,22 @@
 package Triangle.ContextualAnalyzer;
 
 import Triangle.AbstractSyntaxTrees.Declaration;
+import java.util.ArrayList;
 
 public final class IdentificationTable {
 
   private int level;
   public IdEntry latest;
-  public IdEntry latest0;
-
+  public boolean privDecl2 = false;                                 //nuevo
+  public ArrayList<IdEntry> entrys = new ArrayList<IdEntry>();      //nuevo
+  public ArrayList<IdEntry> latests = new ArrayList<IdEntry>();     //nuevo
+  
+  
   public IdentificationTable () {
     level = 0;
     latest = null;
   }
 
-  public void first2latest(){
-      //IdEntry entry = this.latest;
-      this.latest.previous = this.latest0;
-  }
   
   // Opens a new level in the identification table, 1 higher than the
   // current topmost level.
@@ -83,6 +83,16 @@ public final class IdentificationTable {
     // Add new entry ...
     entry = new IdEntry(id, attr, this.level, this.latest);
     this.latest = entry;
+    if(privDecl2 == true){
+        entrys.add(entry);
+        this.privDecl2 = false;
+    }
+  }
+  
+  public void asign() {
+      for (int counter = 0; counter < entrys.size(); counter++) { 		      
+          entrys.get(counter).previous = latests.get(counter); 		
+      }
   }
 
   // Finds an entry for the given identifier in the identification table,

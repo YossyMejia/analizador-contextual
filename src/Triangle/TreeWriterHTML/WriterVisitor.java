@@ -47,6 +47,7 @@ import Triangle.AbstractSyntaxTrees.ProcsDeclaration;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecsDeclaration;
 import Triangle.AbstractSyntaxTrees.RepVarDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
@@ -293,6 +294,8 @@ public class WriterVisitor implements Visitor {
         writeLineXML("</ProcDeclaration>");
         return null;
     }
+    
+   
 
     public Object visitSequentialDeclaration(SequentialDeclaration ast, Object obj) {
         writeLineXML("<SequentialDeclaration>");
@@ -333,6 +336,13 @@ public class WriterVisitor implements Visitor {
         ast.I.visit(this, null);
         ast.E.visit(this, null);
         writeLineXML("</RepVarDeclaration>");
+        return null;
+    }
+    
+    public Object visitRecsDeclaration(RecsDeclaration ast, Object o) {
+        writeLineXML("<RecsDeclaration>");
+        ast.D.visit(this, null);
+        writeLineXML("</RecsDeclaration>");
         return null;
     }
     
@@ -647,6 +657,8 @@ public class WriterVisitor implements Visitor {
         else
             return operator;
     }
+
+    
 
     
 }

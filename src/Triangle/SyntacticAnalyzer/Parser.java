@@ -65,6 +65,7 @@ import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordAggregate;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecsDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -726,8 +727,9 @@ public class Parser {
     case Token.REC:
       {
           acceptIt();
-          dAST = parseProc();
-          accept(Token.END);    
+          ProcsDeclaration pAST = parseProc();
+          accept(Token.END);   
+          dAST = new RecsDeclaration(pAST, declarationPos);
           finish(declarationPos);
       }
       break;
@@ -764,8 +766,8 @@ public class Parser {
     return dAST;
   }
   
-  Declaration parseProc()  throws SyntaxError {     //MODIFICADO
-    Declaration dAST = null;
+  ProcsDeclaration parseProc()  throws SyntaxError {     //MODIFICADO
+    ProcsDeclaration dAST = null;
     
     SourcePosition declarationPos = new SourcePosition();
     start(declarationPos);

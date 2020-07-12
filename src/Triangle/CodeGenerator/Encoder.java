@@ -72,6 +72,7 @@ import Triangle.AbstractSyntaxTrees.ProcsDeclaration;
 import Triangle.AbstractSyntaxTrees.Program;
 import Triangle.AbstractSyntaxTrees.RecordExpression;
 import Triangle.AbstractSyntaxTrees.RecordTypeDenoter;
+import Triangle.AbstractSyntaxTrees.RecsDeclaration;
 import Triangle.AbstractSyntaxTrees.SequentialCommand;
 import Triangle.AbstractSyntaxTrees.SequentialDeclaration;
 import Triangle.AbstractSyntaxTrees.SimpleTypeDenoter;
@@ -357,6 +358,12 @@ public final class Encoder implements Visitor {
     return new Integer(0);
   }
 
+  public Object visitRecsDeclaration(RecsDeclaration ast, Object o){
+   return null;
+  }
+
+
+  
   public Object visitProcDeclaration(ProcDeclaration ast, Object o) {
     Frame frame = (Frame) o;
     int jumpAddr = nextInstrAddr;
@@ -1064,6 +1071,8 @@ public final class Encoder implements Visitor {
       }
     }
   }
+
+    
 
    
     
